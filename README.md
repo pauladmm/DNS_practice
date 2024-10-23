@@ -58,6 +58,9 @@ and the host's IP is 192.168.57.0/24
 8. Se configurarán los siguientes alias:
    a. ns1.sistema.test. será un alias de tierra.sistema.test.
    b. ns2.sistema.test. será un alias de venus.sistema.test..
+   Se modifica el archivo correspondiente en el maestro (db.sistema.test) para indicar los nuevos CNAME de tierra y venus.
+   Se comprueba con:
+   dig @localhost alias
 
 9. mail.sistema.test. será un alias de marte.sistema.test.
 
