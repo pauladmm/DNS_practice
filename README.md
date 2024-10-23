@@ -28,6 +28,12 @@ and the host's IP is 192.168.57.0/24
    y en la red 192.168.57.0/24, para ello utilizarán la opción de listas de control de acceso o acl.
 
 4. El servidor maestro será tierra.sistema.test y tendrá autoridad sobre la zona directa e inversa.
+   Se modifica el archivo /etc/bind/named.conf.local para configurar el servidor como maestro y darle autoridad para la zona directa (sistema.test) e inversa (192.168.57.0/24). Se comprueba que el archivo es correcto:
+   named-checkconf /etc/bind/named.conf.local
+   Se crean los archivos de las zonas directa (/var/lib/bind/db.sistema.test) e inversa (/var/lib/bind/192.168.57). Se crean en este directorio porque el servicio named (que se usa para la comprobación) dispone permiso para leer en estas carpetas. Para comprobar que la zona es correcta se usa:
+   named-checkzone sistema.test. /var/lib/bind/db.sistema.test
+   Se reinicia bind para aplicar los cambios.
+   Se copian los archivos fuera.
 
 5. El servidor esclavo será venus.sistema.test y tendrá como maestro a tierra.sistema.test.
 
