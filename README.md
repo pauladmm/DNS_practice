@@ -67,3 +67,6 @@ and the host's IP is 192.168.57.0/24
 
 10. El equipo marte.sistema.test. actuará como servidor de correo del dominio de correo
     sistema.test.
+    Se añade en el mismo archivo del maestro que los pasos anteriores un registro de MX para marte.sistema.test. o mail.sistema.test.
+    Se comprueba con
+    dig @localhost sistema.test. MX
