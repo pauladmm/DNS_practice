@@ -46,6 +46,8 @@ and the host's IP is 192.168.57.0/24
 
 6. El tiempo en caché de las respuestas negativas de las zonas (directa e inversa) será de dos horas
    (se pone en segundos).
+   Se modifica el archivo maestro correspondiente (db.sistema.test) para cambiar el TTL a 7200s.
+   Se reinicia y se copia el archivo.
 
 7. Aquellas consultas que reciba el servidor para la que no está autorizado, deberá reenviarlas
    (forward) al servidor DNS 208.67.222.222 (OpenDNS).
