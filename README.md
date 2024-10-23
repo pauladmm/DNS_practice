@@ -63,6 +63,7 @@ and the host's IP is 192.168.57.0/24
    dig @localhost alias
 
 9. mail.sistema.test. será un alias de marte.sistema.test.
+   Se añade otro CNAME para marte.sistema.test. que corresponde a mail.sistema.test. en el mismo archivo de antes. Se hace la misma comprobacion.
 
 10. El equipo marte.sistema.test. actuará como servidor de correo del dominio de correo
     sistema.test.
