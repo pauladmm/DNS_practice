@@ -19,6 +19,9 @@ and the host's IP is 192.168.57.0/24
    Se comprueba que hay solo escucha de ipv4 con sudo ss -tuln | grep :53
 
 2. Establecer la opción dnssec-validation a yes
+   Dentro del archivo /etc/bind/named.conf.options se modifica la opcion ndssec-validation a yes.
+   Tambien se comenta la escucha de IPv6 por si acaso.
+   Se copia el archivo de esta configuracion fuera y se reinicia bind para aplicar los cambios.
 
 3. Los servidores permitirán las consultas recursivas sólo a los ordenadores en la red 127.0.0.0/8
    y en la red 192.168.57.0/24, para ello utilizarán la opción de listas de control de acceso o acl.
