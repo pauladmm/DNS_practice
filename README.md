@@ -51,6 +51,9 @@ and the host's IP is 192.168.57.0/24
 
 7. Aquellas consultas que reciba el servidor para la que no está autorizado, deberá reenviarlas
    (forward) al servidor DNS 208.67.222.222 (OpenDNS).
+   Se cambiar la configuracion (named.conf.options) del maestro para autorizar el reenvio de solucituudes al servidor DNS dado (activar fowarders).
+   Comprobacion:
+   named-checkconf /etc/bind/named.conf.local
 
 8. Se configurarán los siguientes alias:
    a. ns1.sistema.test. será un alias de tierra.sistema.test.

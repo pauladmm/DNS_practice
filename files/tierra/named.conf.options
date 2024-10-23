@@ -15,9 +15,9 @@ options {
 	// Uncomment the following block, and insert the addresses replacing 
 	// the all-0's placeholder.
 
-	// forwarders {
-	//	0.0.0.0;
-	// };
+	forwarders {
+		208.67.222.222;
+	 };
 	
 	recursion yes;
 	allow-recursion { trusted; };
