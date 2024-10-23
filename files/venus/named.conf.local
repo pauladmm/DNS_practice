@@ -7,13 +7,13 @@
 //include "/etc/bind/zones.rfc1918";
 
 zone "sistema.test" {
-	type master;
+	type slave;
+	masters { 192.168.57.103; };
 	file "/var/lib/bind/db.sistema.test";
-	allow-transfer { 192.168.57.102; };
-	notify yes;
 };
 
 zone "57.168.192.in-addr.arpa" {
-	type master;
+	type slave;
+	masters { 192.168.57.103; };
 	file "/var/lib/bind/db.192.168.57";
 };

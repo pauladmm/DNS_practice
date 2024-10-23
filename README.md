@@ -36,6 +36,13 @@ and the host's IP is 192.168.57.0/24
    Se copian los archivos fuera.
 
 5. El servidor esclavo será venus.sistema.test y tendrá como maestro a tierra.sistema.test.
+   Se modifica el archivo /etc/bind/named.conf.local para configurar el servidor DNS esclavo venus y su maestro tierra.
+   Se hace una copia del archivo.
+   Se reinicia bin para aplicar los cambios.
+   En el archivo /etc/named.conf.local del servidor maestro de la zona, se debe indicar que se permitan transferencias de zona hacia el servidor esclavo (allow-transfer), y además se configura para que se notifique a los servidores esclavos los cambios que se produzcan en el maestro (notify).
+   También se modifica en el archivo de zona del servidor maestro la existencia de otro servidor DNS para la zona, añadiendo un nuevo registro.
+   Para comprobar que está todoo bien consultamos desde el esclavo al maestro por el registro axfr:
+   dig @192.168.57.103 sistema.test axfr
 
 6. El tiempo en caché de las respuestas negativas de las zonas (directa e inversa) será de dos horas
    (se pone en segundos).
