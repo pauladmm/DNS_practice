@@ -1,15 +1,17 @@
 ;
 ; BIND reverse data file for local loopback interface
 ;
-$TTL	604800
+$TTL	7200
 57.168.192.in-addr.arpa.	IN	SOA	ns1.sistema.test. admin.sistema.test. (
 			2024231001	; Serial
 			 604800		; Refresh
 			  86400		; Retry
 			2419200		; Expire
-			 604800 )	; Negative Cache TTL
+			 7200 )		; Negative Cache TTL
 ;
 57.168.192.in-addr.arpa.	IN	NS	ns1.sistema.test.
 57.168.192.in-addr.arpa.	IN	NS	ns2.sistema.test.
-103.168.192.in-addr.arpa.	IN	PTR	tierra.sistema.test.
-102.168.192.in-addr.arpa.	IN	PTR	venus.siistema.test.
+103	IN	PTR	tierra.sistema.test.
+102	IN	PTR	venus.sistema.test.
+104	IN	PTR	marte.sistema.test.
+101	IN	PTR	mercurio.sistema.test.

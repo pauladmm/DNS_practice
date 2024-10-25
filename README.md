@@ -1,72 +1,92 @@
-# DNS_practice
+# DNS Practice
 
-This practice has a main DNS server, a secondary DNS server with a zone and reverse zone.
+This project includes a primary DNS server, a secondary DNS server, and configurations for a forward and reverse zone.
 
-First of all, we create virtual machine with the following features:
+### Initial Setup
 
-|venus| Debian texto venus.sistema.test .102
+First, we set up virtual machines with the following configurations:
 
-|tierra| Debian texto tierra.sistema.test .103
-and the host's IP is 192.168.57.0/24
+| Server   | OS         | Hostname              | IP             |
+| -------- | ---------- | --------------------- | -------------- |
+| mercurio |            | mercurio.sistema.test | 192.168.57.101 |
+| venus    | Debian CLI | venus.sistema.test    | 192.168.57.102 |
+| tierra   | Debian CLI | tierra.sistema.test   | 192.168.57.103 |
+| marte    |            | marte.sistema.test    | 192.168.57.104 |
 
-1. Activa solamente la escucha del servidor para el protocolo IPv4.
-   Se modifican los archivos de configuración de bind9 (en ambas máquinas), que normalmente se encuentra en /etc/default/named
-   Se activa la escucha modificando el archivo de la siguiente manera:
-   OPTIONS = "-u bind -4"
+The host network is set to `192.168.57.0/24`.
 
-   Se hacen copias de ambos archivos de configuracion fuera de las mv.
-   Se reinicia al servicio DNS de BIND para que los cambios se apliquen con sudo systemctl restart bind9.
-   Se comprueba que hay solo escucha de ipv4 con sudo ss -tuln | grep :53
+### Steps
 
-2. Establecer la opción dnssec-validation a yes
-   Dentro del archivo /etc/bind/named.conf.options se modifica la opcion ndssec-validation a yes.
-   Tambien se comenta la escucha de IPv6 por si acaso.
-   Se copia el archivo de esta configuracion fuera y se reinicia bind para aplicar los cambios.
-   systemctl status named para comprobar su estado.
+1. **Activate server listening for IPv4 protocol only**  
+    Modify the BIND9 configuration files (`/etc/default/named`) on both servers to enable IPv4 listening only:
 
-3. Los servidores permitirán las consultas recursivas sólo a los ordenadores en la red 127.0.0.0/8
-   y en la red 192.168.57.0/24, para ello utilizarán la opción de listas de control de acceso o acl.
+   `OPTIONS="-u bind -4"`
+   Restart BIND with sudo systemctl restart bind9, and verify IPv4 listening with:
 
-4. El servidor maestro será tierra.sistema.test y tendrá autoridad sobre la zona directa e inversa.
-   Se modifica el archivo /etc/bind/named.conf.local para configurar el servidor como maestro y darle autoridad para la zona directa (sistema.test) e inversa (192.168.57.0/24). Se comprueba que el archivo es correcto:
-   named-checkconf /etc/bind/named.conf.local
-   Se crean los archivos de las zonas directa (/var/lib/bind/db.sistema.test) e inversa (/var/lib/bind/192.168.57). Se crean en este directorio porque el servicio named (que se usa para la comprobación) dispone permiso para leer en estas carpetas. Para comprobar que la zona es correcta se usa:
-   named-checkzone sistema.test. /var/lib/bind/db.sistema.test
-   Se reinicia bind para aplicar los cambios.
-   Se copian los archivos fuera.
+   `sudo ss -tuln | grep :53`
 
-5. El servidor esclavo será venus.sistema.test y tendrá como maestro a tierra.sistema.test.
-   Se modifica el archivo /etc/bind/named.conf.local para configurar el servidor DNS esclavo venus y su maestro tierra.
-   Se hace una copia del archivo.
-   Se reinicia bin para aplicar los cambios.
-   En el archivo /etc/named.conf.local del servidor maestro de la zona, se debe indicar que se permitan transferencias de zona hacia el servidor esclavo (allow-transfer), y además se configura para que se notifique a los servidores esclavos los cambios que se produzcan en el maestro (notify).
-   También se modifica en el archivo de zona del servidor maestro la existencia de otro servidor DNS para la zona, añadiendo un nuevo registro.
-   Para comprobar que está todoo bien consultamos desde el esclavo al maestro por el registro axfr:
-   dig @192.168.57.103 sistema.test axfr
+2. **Enable DNSSEC Validation**
 
-6. El tiempo en caché de las respuestas negativas de las zonas (directa e inversa) será de dos horas
-   (se pone en segundos).
-   Se modifica el archivo maestro correspondiente (db.sistema.test) para cambiar el TTL a 7200s.
-   Se reinicia y se copia el archivo.
+Set dnssec-validation to yes in /etc/bind/named.conf.options and disable IPv6 listening if necessary. Restart BIND and verify answer is validated.
 
-7. Aquellas consultas que reciba el servidor para la que no está autorizado, deberá reenviarlas
-   (forward) al servidor DNS 208.67.222.222 (OpenDNS).
-   Se cambiar la configuracion (named.conf.options) del maestro para autorizar el reenvio de solucituudes al servidor DNS dado (activar fowarders).
-   Comprobacion:
-   named-checkconf /etc/bind/named.conf.local
+`dig +dnssec google.com`
 
-8. Se configurarán los siguientes alias:
-   a. ns1.sistema.test. será un alias de tierra.sistema.test.
-   b. ns2.sistema.test. será un alias de venus.sistema.test..
-   Se modifica el archivo correspondiente en el maestro (db.sistema.test) para indicar los nuevos CNAME de tierra y venus.
-   Se comprueba con:
-   dig @localhost alias
+3. **Configure Recursive Queries for Specific Networks**
 
-9. mail.sistema.test. será un alias de marte.sistema.test.
-   Se añade otro CNAME para marte.sistema.test. que corresponde a mail.sistema.test. en el mismo archivo de antes. Se hace la misma comprobacion.
+Configure acl in named.conf.options to allow recursive queries only from 127.0.0.0/8 and 192.168.57.0/24.
 
-10. El equipo marte.sistema.test. actuará como servidor de correo del dominio de correo
-    sistema.test.
-    Se añade en el mismo archivo del maestro que los pasos anteriores un registro de MX para marte.sistema.test. o mail.sistema.test.
-    Se comprueba con
-    dig @localhost sistema.test. MX
+4. **Configure Primary Server (tierra.sistema.test)**
+
+Set tierra.sistema.test as the authoritative server for the forward (sistema.test) and reverse (192.168.57.0/24) zones.
+Update /etc/bind/named.conf.local to define the server as master.
+Check configurations with:
+
+`named-checkconf /etc/bind/named.conf.local`
+
+Create forward (/var/lib/bind/db.sistema.test) and reverse (/var/lib/bind/db.192.168.57) zone files and verify them:
+
+`named-checkzone sistema.test /var/lib/bind/db.sistema.test`
+
+`sudo named-checkzone 57.168.192.in-addr.arpa /var/lib/bind/db.192.168.57`
+
+Restart BIND.
+
+5. **Configure Secondary Server (venus.sistema.test)**
+
+Define venus.sistema.test as the secondary server in /etc/bind/named.conf.local.
+Set up zone transfers (allow-transfer) and notify settings on the primary server for venus.
+Add DNS record for the secondary server in the master zone file and verify with:
+
+`dig @192.168.57.103 sistema.test axfr`
+
+6. **Set Negative Cache TTL**
+   In the master zone file (db.sistema.test), set the TTL for negative responses to 7200 seconds. Restart BIND.
+
+7. **Forward Unresolved Queries to OpenDNS**
+   Configure the master server to forward unresolved queries to OpenDNS (208.67.222.222) in named.conf.options:
+
+`forwarders { 208.67.222.222; };`
+
+Verify with:
+
+`named-checkconf /etc/bind/named.conf.local`
+
+8. **Configure Aliases**
+
+Set ns1.sistema.test as an alias for tierra.sistema.test and ns2.sistema.test as an alias for venus.sistema.test.
+Update the primary zone file (db.sistema.test) to include these CNAME records and verify with:
+
+`dig @localhost ns1.sistema.test`
+`dig @localhost ns2.sistema.test`
+
+9. **Add mail.sistema.test Alias**
+
+Define mail.sistema.test as an alias for marte.sistema.test in the primary zone file. Verify with:
+
+`dig @localhost mail.sistema.test`
+
+10. **Configure marte.sistema.test as Mail Server**
+
+Add an MX record for marte.sistema.test or mail.sistema.test in the primary zone file to set it as the mail server for sistema.test. Verify with:
+
+`dig @localhost sistema.test. MX`
